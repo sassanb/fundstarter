@@ -1,5 +1,5 @@
 // Part 1
-var http = require('http');
+/* http = require('http');
 var fs = require('fs');
 var filename = 'public/index.html';
 
@@ -11,7 +11,7 @@ http.createServer(function(req,response){
     response.write(buff)
     response.end()
 }).listen(8080);
-
+*/
 
 //var http = require('http'),
 //     fs = require('fs');
@@ -28,5 +28,36 @@ http.createServer(function(req,response){
     }).listen(8080);
  });
 */
+
+// part2 buffer 
+
+var http = require('http');
+var fs = require('fs');
+
+var p = './public/index.html';
+http.createServer(function (request, response) {
+  response.writeHead(200, {'Content-Type': 'text/html'});
+  fs.open('./public/index.html', 'r', function(err, fd){
+    fs.fstat(fd, function(err, stats) {
+      var Size = 512,
+      sizeofBuffer = stats.size,
+      buffer = new Buffer(sizeofBuffer ),
+      startBytes = 0;
+      while(startBytes < sizeofBuffer) {
+		    if((startBytes  + Size) > sizeofBuffer) {
+			  Size = (sizeofBuffer- startBytes);
+		    }
+		    fs.read(fd, buffer, startBytes , Size, startBytes );
+		    startBytes  += Size;
+		}
+    response.end(buffer.toString('utf8', 0,sizeofBuffer));
+    fs.close(fd);
+  }); // for fs.fstat
+
+  }); // for fs.open
+
+}).listen(8080);
+
+console.log("App is running on localhost:8080");
 
 
